@@ -34,14 +34,10 @@ try {
   assert.match(await page.locator('#output').textContent(), /便携咖啡杯/);
   assert.equal(await page.locator('[data-credits]').first().textContent(), '19');
   await page.screenshot({ path: 'artifacts/generated.png', fullPage: true });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.evaluate(async () => {
-    document.documentElement.style.scrollBehavior = 'auto';
-    window.scrollTo(0, 0);
-    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-  });
-  await page.screenshot({ path: 'artifacts/mobile.png', fullPage: true });
-  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await mobile.goto(config.baseUrl);
+  await mobile.screenshot({ path: 'artifacts/mobile.png', fullPage: true });
+  assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   console.log('PASS: home → standard pack → RSA2 mock notify → paid receipt → generation → credits 20 → 19');
   console.log('Screenshots: artifacts/home.png, artifacts/receipt.png, artifacts/generated.png, artifacts/mobile.png');
 } finally {
